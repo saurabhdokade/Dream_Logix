@@ -26,8 +26,8 @@ const clientSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      unique: true,
-      lowercase: true
+      // unique: true,
+      // lowercase: true
     },
     type: {
       type: String,
