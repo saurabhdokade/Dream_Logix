@@ -7,10 +7,23 @@ const bcrypt = require("bcrypt")
 const crypto = require("crypto");
 // Create Client
 exports.createClient = catchAsyncErrors(async (req, res, next) => {
-  const { firstName, lastName, status,businessName, type,referral, country, state, email, phone, password, confirmPassword } = req.body;
+  const {
+    firstName,
+    lastName,
+    status,
+    businessName,
+    type,
+    referral,
+    country,
+    state,
+    Email,
+    phone,
+    password,
+    confirmPassword
+  } = req.body;
 
   // Basic validation
-  if (!firstName || !lastName || !businessName  ||!status   || !phone || !password || !confirmPassword || !country || !state) {
+  if (!firstName || !lastName || !businessName || !status || !phone || !password || !confirmPassword || !country || !state) {
     return next(new ErrorHandler("All fields are required", 400));
   }
 
@@ -22,26 +35,25 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
   // Validate country and state
   const countryStates = {
     India: [
-     "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa",
-  "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala",
-  "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
-  "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
-  "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands",
-  "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Lakshadweep", "Delhi", "Puducherry"
+      "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa",
+      "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala",
+      "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
+      "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+      "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands",
+      "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Lakshadweep", "Delhi", "Puducherry"
     ],
     Germany: [
-      "Baden-Württemberg", "Bavaria", "Berlin", "Brandenburg", "Bremen", 
-      "Hamburg", "Hesse", "Lower Saxony", "Mecklenburg-Vorpommern", "North Rhine-Westphalia", 
-      "Rhineland-Palatinate", "Saarland", "Saxony", "Saxony-Anhalt", 
+      "Baden-Württemberg", "Bavaria", "Berlin", "Brandenburg", "Bremen",
+      "Hamburg", "Hesse", "Lower Saxony", "Mecklenburg-Vorpommern", "North Rhine-Westphalia",
+      "Rhineland-Palatinate", "Saarland", "Saxony", "Saxony-Anhalt",
       "Schleswig-Holstein", "Thuringia"
     ],
     Australia: [
-      "New South Wales", "Queensland", "South Australia", "Tasmania", 
+      "New South Wales", "Queensland", "South Australia", "Tasmania",
       "Victoria", "Western Australia", "Australian Capital Territory", "Northern Territory"
     ]
   };
 
-  // Check if the state is valid for the given country
   if (!countryStates[country] || !countryStates[country].includes(state)) {
     return next(new ErrorHandler('Invalid state for the selected country', 400));
   }
@@ -50,14 +62,17 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
   const existingClient = await Client.findOne({ phone });
 
   if (existingClient) {
-    return next(new ErrorHandler("Client with this email or phone already exists", 400));
+    return next(new ErrorHandler("Client with this phone already exists", 400));
   }
 
-  // Create new client
-  const client = await Client.create({
+  if (existingClient) {
+    return next(new ErrorHandler("Client with this phone or email already exists", 400));
+  }
+
+  // Prepare client data
+  const clientData = {
     firstName,
     lastName,
-    email,
     status,
     businessName,
     referral,
@@ -68,7 +83,16 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
     role: "Client",
     country,
     state
-  });
+  };
+
+ // If email is provided, add it to client data
+//  if (email && email.trim() !== "") {
+//   clientData.email = email;
+// }
+
+
+  // Create client
+  const client = await Client.create(clientData);
 
   res.status(201).json({
     success: true,
@@ -76,6 +100,7 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
     client
   });
 });
+
 
 
 exports.clientLogin = catchAsyncErrors(async (req, res, next) => {
