@@ -7,16 +7,42 @@ const bcrypt = require("bcrypt")
 const crypto = require("crypto");
 // Create Client
 exports.createClient = catchAsyncErrors(async (req, res, next) => {
-  const { firstName, lastName, email, phone, password, confirmPassword } = req.body;
+  const { firstName, lastName, businessName, referral, country, state, email, phone, password, confirmPassword } = req.body;
 
   // Basic validation
-  if (!firstName || !lastName || !email || !phone || !password || !confirmPassword) {
+  if (!firstName || !lastName || !businessName || !referral || !email || !phone || !password || !confirmPassword || !country || !state) {
     return next(new ErrorHandler("All fields are required", 400));
   }
 
   // Check password match
   if (password !== confirmPassword) {
     return next(new ErrorHandler("Passwords do not match", 400));
+  }
+
+  // Validate country and state
+  const countryStates = {
+    India: [
+      "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
+      "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", 
+      "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", 
+      "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
+      "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+    ],
+    Germany: [
+      "Baden-Württemberg", "Bavaria", "Berlin", "Brandenburg", "Bremen", 
+      "Hamburg", "Hesse", "Lower Saxony", "Mecklenburg-Vorpommern", "North Rhine-Westphalia", 
+      "Rhineland-Palatinate", "Saarland", "Saxony", "Saxony-Anhalt", 
+      "Schleswig-Holstein", "Thuringia"
+    ],
+    Australia: [
+      "New South Wales", "Queensland", "South Australia", "Tasmania", 
+      "Victoria", "Western Australia", "Australian Capital Territory", "Northern Territory"
+    ]
+  };
+
+  // Check if the state is valid for the given country
+  if (!countryStates[country] || !countryStates[country].includes(state)) {
+    return next(new ErrorHandler('Invalid state for the selected country', 400));
   }
 
   // Check if client already exists
@@ -33,10 +59,14 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
     firstName,
     lastName,
     email,
+    businessName,
+    referral,
     phone,
     password,
     confirmPassword,
-    role: "Client"
+    role: "Client",
+    country,
+    state
   });
 
   res.status(201).json({
@@ -45,6 +75,7 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
     client
   });
 });
+
 
 exports.clientLogin = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
@@ -202,4 +233,26 @@ exports.resetPasswordClient = catchAsyncErrors(async (req, res, next) => {
   await client.save();
 
   sendToken(client, 200, res);
+});
+
+
+
+// Suspend a Client User
+exports.suspendClient = catchAsyncErrors(async (req, res, next) => {
+  const { userId } = req.params;
+
+  const user = await Client.findById(userId);
+
+  if (!user || user.role !== 'Client') {
+    return next(new ErrorHander("Client user not found", 404));
+  }
+
+  user.status = "Suspend";
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Client user has been suspended.",
+    user,
+  });
 });

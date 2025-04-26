@@ -43,11 +43,39 @@ const clientSchema = new mongoose.Schema(
     },
     country: {
       type: String,
-      required: false
+      required: false,
+      enum: ['India', 'Germany', 'Australia'], // Enum for countries
     },
     state: {
       type: String,
-      required: false
+      required: false,
+      validate: {
+        validator: function(value) {
+          const countryStates = {
+            India: [
+              "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
+              "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", 
+              "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", 
+              "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
+              "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+            ],
+            Germany: [
+              "Baden-Württemberg", "Bavaria", "Berlin", "Brandenburg", "Bremen", 
+              "Hamburg", "Hesse", "Lower Saxony", "Mecklenburg-Vorpommern", "North Rhine-Westphalia", 
+              "Rhineland-Palatinate", "Saarland", "Saxony", "Saxony-Anhalt", 
+              "Schleswig-Holstein", "Thuringia"
+            ],
+            Australia: [
+              "New South Wales", "Queensland", "South Australia", "Tasmania", 
+              "Victoria", "Western Australia", "Australian Capital Territory", "Northern Territory"
+            ]
+          };
+  
+          // Check if the state is valid for the given country
+          return countryStates[this.country] && countryStates[this.country].includes(value);
+        },
+        message: 'Invalid state for the selected country'
+      }
     },
     password: {
       type: String,
@@ -109,7 +137,12 @@ const clientSchema = new mongoose.Schema(
     tags: {
       type: [String],
       default: []
-    }
+    },
+  status: {
+    type: String,
+    enum: ["Pending", "Active", "Suspend", "Banned"],
+    default: "Pending",
+  },
   },
   { timestamps: true }
 );

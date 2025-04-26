@@ -7,7 +7,7 @@ const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 //create partener 
 exports.createPartner = catchAsyncErrors(async (req, res, next) => {
-  const { firstName, lastName, email, phone, password, confirmPassword } = req.body;
+  const { firstName, lastName,  businessName, country, state,email, phone, password, confirmPassword } = req.body;
 
   // Basic validation
   if (!firstName || !lastName || !email || !phone || !password || !confirmPassword) {
@@ -19,6 +19,33 @@ exports.createPartner = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Passwords do not match", 400));
   }
 
+
+    // Validate country and state
+    const countryStates = {
+      India: [
+        "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
+        "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", 
+        "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", 
+        "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
+        "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+      ],
+      Germany: [
+        "Baden-Württemberg", "Bavaria", "Berlin", "Brandenburg", "Bremen", 
+        "Hamburg", "Hesse", "Lower Saxony", "Mecklenburg-Vorpommern", "North Rhine-Westphalia", 
+        "Rhineland-Palatinate", "Saarland", "Saxony", "Saxony-Anhalt", 
+        "Schleswig-Holstein", "Thuringia"
+      ],
+      Australia: [
+        "New South Wales", "Queensland", "South Australia", "Tasmania", 
+        "Victoria", "Western Australia", "Australian Capital Territory", "Northern Territory"
+      ]
+    };
+  
+    // Check if the state is valid for the given country
+    if (!countryStates[country] || !countryStates[country].includes(state)) {
+      return next(new ErrorHandler('Invalid state for the selected country', 400));
+    }
+  
   // Check if client already exists
   const existingClient = await Partner.findOne({
     $or: [{ email }, { phone }]
@@ -34,6 +61,7 @@ exports.createPartner = catchAsyncErrors(async (req, res, next) => {
     lastName,
     email,
     phone,
+    businessName, referral, country, state,
     password,
     confirmPassword,
     role:"partner"
