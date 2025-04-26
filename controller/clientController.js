@@ -7,10 +7,10 @@ const bcrypt = require("bcrypt")
 const crypto = require("crypto");
 // Create Client
 exports.createClient = catchAsyncErrors(async (req, res, next) => {
-  const { firstName, lastName, businessName, referral, country, state, email, phone, password, confirmPassword } = req.body;
+  const { firstName, lastName, status,businessName, type,referral, country, state, email, phone, password, confirmPassword } = req.body;
 
   // Basic validation
-  if (!firstName || !lastName || !businessName || !referral || !email || !phone || !password || !confirmPassword || !country || !state) {
+  if (!firstName || !lastName || !businessName  ||!status ||!referral  || !phone || !password || !confirmPassword || !country || !state) {
     return next(new ErrorHandler("All fields are required", 400));
   }
 
@@ -22,11 +22,12 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
   // Validate country and state
   const countryStates = {
     India: [
-      "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
-      "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", 
-      "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", 
-      "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
-      "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+     "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa",
+  "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala",
+  "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
+  "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+  "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands",
+  "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Lakshadweep", "Delhi", "Puducherry"
     ],
     Germany: [
       "Baden-Württemberg", "Bavaria", "Berlin", "Brandenburg", "Bremen", 
@@ -59,8 +60,10 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
     firstName,
     lastName,
     email,
+    status,
     businessName,
     referral,
+    type,
     phone,
     password,
     confirmPassword,
