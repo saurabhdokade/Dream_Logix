@@ -47,9 +47,7 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
   }
 
   // Check if client already exists
-  const existingClient = await Client.findOne({
-    $or: [{ email }, { phone }]
-  });
+  const existingClient = await Client.findOne({ phone });
 
   if (existingClient) {
     return next(new ErrorHandler("Client with this email or phone already exists", 400));
