@@ -16,7 +16,7 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
     referral,
     country,
     state,
-    Email,
+    email,
     phone,
     password,
     confirmPassword
@@ -77,6 +77,7 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
     businessName,
     referral,
     type,
+    email,
     phone,
     password,
     confirmPassword,

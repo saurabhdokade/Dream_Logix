@@ -29,7 +29,7 @@ const clientSchema = new mongoose.Schema(
       sparse: true, 
       trim: true,
       lowercase: true,
-      default: null 
+      // default: null 
     },
     type: {
       type: String,
