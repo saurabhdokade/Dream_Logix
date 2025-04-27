@@ -10,7 +10,7 @@ exports.createPartner = catchAsyncErrors(async (req, res, next) => {
   const { firstName, lastName,  businessName, country, state,email, phone, password, confirmPassword } = req.body;
 
   // Basic validation
-  if (!firstName || !lastName || !email || !phone || !password || !confirmPassword) {
+  if (!firstName || !lastName  || !phone || !password || !confirmPassword) {
     return next(new ErrorHandler("All fields are required", 400));
   }
 
