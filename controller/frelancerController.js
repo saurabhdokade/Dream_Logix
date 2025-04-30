@@ -48,9 +48,11 @@ exports.createfrelancer = catchAsyncErrors(async (req, res, next) => {
 
 
   // Check if client already exists
-  const existingClient = await Freelancer.findOne({
-    $or: [{ email }, { phone }]
-  });
+  // const existingClient = await Freelancer.findOne({
+  //   $or: [{ email }, { phone }]
+  // });
+    const existingClient = await Freelancer.findOne({ phone });
+  
 
   if (existingClient) {
     return next(new ErrorHandler("Client with this email or phone already exists", 400));

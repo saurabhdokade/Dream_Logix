@@ -21,8 +21,10 @@ const freelancerSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, "Please provide email"],
-    unique: true,
+    sparse: true, 
+    trim: true,
+    lowercase: true,
+    // unique: true,
   },
   type: {
     type: String,
