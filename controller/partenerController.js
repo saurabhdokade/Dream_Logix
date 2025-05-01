@@ -61,7 +61,7 @@ exports.createPartner = catchAsyncErrors(async (req, res, next) => {
     lastName,
     email,
     phone,
-    businessName, referral, country, state,
+    businessName, country, state,
     password,
     confirmPassword,
     role:"partner"
