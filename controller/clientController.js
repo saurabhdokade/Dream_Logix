@@ -23,7 +23,7 @@ exports.createClient = catchAsyncErrors(async (req, res, next) => {
   } = req.body;
 
   // Basic validation
-  if (!firstName || !lastName || !businessName || !status || !phone || !password || !confirmPassword || !country || !state) {
+  if (!firstName || !lastName   || !phone || !password || !confirmPassword ) {
     return next(new ErrorHandler("All fields are required", 400));
   }
 
