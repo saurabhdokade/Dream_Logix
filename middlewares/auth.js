@@ -1,7 +1,7 @@
 const ErrorHander = require("../utils/errorhandler");
 const catchAsyncErrors = require("./catchAsyncErrors");
 const jwt = require("jsonwebtoken");
-const User = require("../model/userModel");
+const User = require("../model/adminModel");
 // exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 //   const token = req.cookies.token; // Token from cookies
 
@@ -78,18 +78,16 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   try {
       let token = req.header("Authorization");
 
-      console.log("Token:", token); // Log the token for debugging
-
+      console.log("Token:", token);
       if (!token || !token.startsWith("Bearer ")) {
           return res.status(401).json({ msg: "Access Denied: No token provided" });
       }
 
       token = token.split(" ")[1];
-      console.log("Token after split:", token); // Log the token for debugging
+      console.log("Token after split:", token); 
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("Decoded:", decoded); // Log the decoded payload for debugging
-
+      console.log("Decoded:", decoded);
       const user = await User.findById(decoded.id).select("-password");
       if (!user)
           return res.status(401).json({ msg: "Access Denied: Invalid User" });
@@ -97,7 +95,7 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
       req.user = user;
       next();
   } catch (error) {
-      console.error("Token verification error:", error); // Log the error for debugging
+      console.error("Token verification error:", error); 
       res.status(401).json({ msg: "Invalid token!" });
   }
 });

@@ -10,10 +10,11 @@ const {
   resetPasswordPartner,
   logoutPartner,
 } = require("../controller/partenerController");
+const { isAuthenticatedUser } = require("../middlewares/auth");
 
 router.post("/add", createPartner);
 router.post("/login",partenerLogin)
-router.get("/partners", getAllPartners);
+router.get("/partners",isAuthenticatedUser, getAllPartners);
 router.put("/partners/:id", updatePartner);
 router.delete("/partners/:id", deletePartner);
 

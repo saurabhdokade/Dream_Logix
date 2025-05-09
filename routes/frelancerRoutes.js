@@ -10,11 +10,12 @@ const {
   updatePortfolioStatus,forgotPasswordFreelancer,
   resetPasswordFreelancer,logoutfrelancer
 } = require("../controller/frelancerController");
+const { isAuthenticatedUser } = require("../middlewares/auth");
 
 // Freelancer CRUD
 router.post("/frelancers/add", createfrelancer);
 router.post("/frelancers/login", freelancerLogin)
-router.get("/freelancers", getAllFreelancers);
+router.get("/freelancers", isAuthenticatedUser,getAllFreelancers);
 router.put("/freelancers/:id", updateFreelancer);
 router.delete("/freelancers/:id", deleteFreelancer);
 

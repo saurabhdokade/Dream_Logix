@@ -11,10 +11,11 @@ const {
   logoutClient,
   suspendClient,
 } = require("../controller/clientController");
+const { isAuthenticatedUser } = require("../middlewares/auth");
 
 router.post("/clients/add", createClient);
 router.post("/clients/login", clientLogin)
-router.get("/clients", getAllClients);
+router.get("/clients", isAuthenticatedUser, getAllClients);
 router.put("/clients/:id", updateClient);
 router.delete("/clients/:id", deleteClient);
 
