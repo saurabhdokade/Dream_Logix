@@ -19,6 +19,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: "*", credentials: true }));
+app.use(cors({
+  origin: ["http://localhost:3000","https://dashlite-nu.vercel.app/"],
+  credentials: true
+}));
 
 
 // Routes
