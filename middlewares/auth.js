@@ -74,31 +74,46 @@ const User = require("../model/adminModel");
 //     return next(new ErrorHander("Invalid or expired token.", 401));
 //   }
 // });
+// exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
+//   try {
+//       let token = req.header("Authorization");
+
+//       console.log("Token:", token);
+//       if (!token || !token.startsWith("Bearer ")) {
+//           return res.status(401).json({ msg: "Access Denied: No token provided" });
+//       }
+
+//       token = token.split(" ")[1];
+//       console.log("Token after split:", token); 
+
+//       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//       console.log("Decoded:", decoded);
+//       const user = await User.findById(decoded.id).select("-password");
+//       if (!user)
+//           return res.status(401).json({ msg: "Access Denied: Invalid User" });
+
+//       req.user = user;
+//       next();
+//   } catch (error) {
+//       console.error("Token verification error:", error); 
+//       res.status(401).json({ msg: "Invalid token!" });
+//   }
+// });
+
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-  try {
-      let token = req.header("Authorization");
+  const { token } = req.cookies;
 
-      console.log("Token:", token);
-      if (!token || !token.startsWith("Bearer ")) {
-          return res.status(401).json({ msg: "Access Denied: No token provided" });
-      }
-
-      token = token.split(" ")[1];
-      console.log("Token after split:", token); 
-
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("Decoded:", decoded);
-      const user = await User.findById(decoded.id).select("-password");
-      if (!user)
-          return res.status(401).json({ msg: "Access Denied: Invalid User" });
-
-      req.user = user;
-      next();
-  } catch (error) {
-      console.error("Token verification error:", error); 
-      res.status(401).json({ msg: "Invalid token!" });
+  if (!token) {
+    return next(new ErrorHander("Please login to access this resource", 401));
   }
+
+  const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
+  req.user = await User.findById(decodedData.id);
+
+  next();
 });
+
 
 
 exports.authorizeRoles = (...roles) =>{
